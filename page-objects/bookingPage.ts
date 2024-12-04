@@ -61,12 +61,12 @@ export class BookingPage {
         await this.doneButton.click();
     }
 
-    async verifyResult(expectedResult: string) {
+    async validateSearchResult(expectedResult: string) {
         await expect(this.textResult).toContainText(expectedResult + ": ");
     }
 
     async search() {
-        await this.page.locator(".b9fd3c6b3c").click();
+        await this.page.locator("button[type='submit']").click();
     }
 
     async closeModal() {

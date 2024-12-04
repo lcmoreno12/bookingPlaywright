@@ -21,7 +21,7 @@ testCases.forEach(({ location, checkin, checkout, childrenAge }) => {
 
     await homePage.search();
 
-    await homePage.verifyResult(location);
+    await homePage.validateSearchResult(location);
 
     await page.close();
 

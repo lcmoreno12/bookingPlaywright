@@ -4,27 +4,29 @@ export class BookingPage {
     page: Page;
     locationInput: Locator
     datePicker: Locator
-    checkInDatePicker: Locator
-    checkOutDatePicker: Locator
+    //checkInDatePicker: Locator
+    //checkOutDatePicker: Locator
     ocupancySelector: Locator
     addChildren: Locator
     childrenAge: Locator
     doneButton: Locator
     modalCloseButton: Locator
     textResult: Locator
+    
+    checkInOutDateBaseXpath = "[data-date='";
 
     constructor(page: Page) {
         this.page = page;
-        this.locationInput = page.locator('.eb46370fe1');
-        this.datePicker = page.locator('.f73e6603bf');
-        this.checkInDatePicker = page.locator('[data-date="2024-11-12"]');
-        this.checkOutDatePicker = page.locator('[data-date="2024-11-19"]');
+        this.locationInput = page.locator('[data-testid="destination-container"] input');
+        this.datePicker = page.locator('[data-testid="date-display-field-start"]');
+        //this.checkInDatePicker = page.locator('[data-date="2024-12-12"]');
+        //this.checkOutDatePicker = page.locator('[data-date="2024-12-19"]');
         this.ocupancySelector = page.locator('button[data-testid="occupancy-config"]');
         this.addChildren = page.locator('input#group_children ~ div:last-of-type > button:last-of-type');
         this.childrenAge = page.locator("select[name='age']");
-        this.doneButton = page.locator('.c213355c26');
+        this.doneButton = page.locator('div[data-testid="occupancy-popup"] > div ~  button');
         this.modalCloseButton = page.locator('[aria-label="No quiero iniciar sesión."]');
-        this.textResult = page.locator(".d5f78961c3");
+        this.textResult = page.locator("div h1");
     }
 
     async navigateTo(page: string) {
@@ -35,15 +37,22 @@ export class BookingPage {
         await this.locationInput.fill(location);
     }
 
-    async selectDate() {
+    async selectDate(checkin: string, checkout: string) {
         await this.datePicker.click();
 
-        await this.checkInDatePicker.waitFor({ state: 'visible' });
-        await this.checkInDatePicker.click();
-
-        await this.checkOutDatePicker.waitFor({ state: 'visible' });
-        await this.checkOutDatePicker.click();
+        const checkInSelector = this.checkInOutDateBaseXpath + checkin + "']";
+        const checkOutSelector = this.checkInOutDateBaseXpath + checkout + "']";
+    
+        const checkInElement = this.page.locator(checkInSelector);
+        const checkOutElement = this.page.locator(checkOutSelector);
+    
+        await checkInElement.waitFor({ state: 'visible' });
+        await checkInElement.click();
+    
+        await checkOutElement.waitFor({ state: 'visible' });
+        await checkOutElement.click();
     }
+    
 
     async addChildrenOcupancy(age: string) {
         await this.ocupancySelector.click();
@@ -53,7 +62,7 @@ export class BookingPage {
     }
 
     async verifyResult(expectedResult: string) {
-        await expect(this.textResult).toContainText(expectedResult);
+        await expect(this.textResult).toContainText(expectedResult + ": ");
     }
 
     async search() {

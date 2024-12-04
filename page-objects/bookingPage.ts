@@ -10,9 +10,10 @@ export class BookingPage {
     addChildren: Locator
     childrenAge: Locator
     doneButton: Locator
+    searchButton: Locator
     modalCloseButton: Locator
     textResult: Locator
-    
+
     checkInOutDateBaseXpath = "[data-date='";
 
     constructor(page: Page) {
@@ -25,6 +26,7 @@ export class BookingPage {
         this.addChildren = page.locator('input#group_children ~ div:last-of-type > button:last-of-type');
         this.childrenAge = page.locator("select[name='age']");
         this.doneButton = page.locator('div[data-testid="occupancy-popup"] > div ~  button');
+        this.searchButton = page.locator("button[type='submit']");
         this.modalCloseButton = page.locator('[aria-label="No quiero iniciar sesión."]');
         this.textResult = page.locator("div h1");
     }
@@ -37,22 +39,27 @@ export class BookingPage {
         await this.locationInput.fill(location);
     }
 
-    async selectDate(checkin: string, checkout: string) {
+    async selectDates(checkin: Date, checkout: Date) {
         await this.datePicker.click();
+        await this.selectDate(checkin, checkout);
+    }
 
-        const checkInSelector = this.checkInOutDateBaseXpath + checkin + "']";
-        const checkOutSelector = this.checkInOutDateBaseXpath + checkout + "']";
-    
+    async selectDate(checkin: Date, checkout: Date) {
+        const checkinString = checkin.toISOString().split('T')[0];
+        const checkoutString = checkout.toISOString().split('T')[0];
+        const checkInSelector = this.checkInOutDateBaseXpath + checkinString + "']";
+        const checkOutSelector = this.checkInOutDateBaseXpath + checkoutString + "']";
+
         const checkInElement = this.page.locator(checkInSelector);
         const checkOutElement = this.page.locator(checkOutSelector);
-    
+
         await checkInElement.waitFor({ state: 'visible' });
         await checkInElement.click();
-    
+
         await checkOutElement.waitFor({ state: 'visible' });
         await checkOutElement.click();
     }
-    
+
 
     async addChildrenOcupancy(age: string) {
         await this.ocupancySelector.click();
@@ -66,7 +73,7 @@ export class BookingPage {
     }
 
     async search() {
-        await this.page.locator("button[type='submit']").click();
+        await this.searchButton.click();
     }
 
     async closeModal() {

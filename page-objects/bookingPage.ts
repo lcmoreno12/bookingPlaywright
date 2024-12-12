@@ -61,16 +61,18 @@ export class BookingPage {
         await checkOutElement.click();
     }
 
-    async setOccupancy(adultsQuantity: number, roomQuantity: number, age: string) {
+    async setOccupancy(adultsQuantity: number, roomQuantity: number, childrenQuantity: number, age: string[]) {
         await this.ocupancySelector.click();
         await this.addExtraAdults(adultsQuantity);
         await this.addExtraRoom(roomQuantity);
-        await this.addChildrenOccupancy(age);
+        await this.setChildren(childrenQuantity, age);
     }
 
-    async addChildrenOccupancy(age: string) {
-        await this.addChildren.click();
-        await this.childrenAge.selectOption({ value: age });
+    async setChildren(childrenQuantity: number, age: string[]) {
+        for (let i = 0; i < childrenQuantity; i++) {
+            await this.addChildren.click();
+            await this.childrenAge.nth(i).selectOption({ value: age[i] });
+        }
         await this.doneButton.click();
     }
 

@@ -8,11 +8,14 @@ export class BookingPage {
     //checkOutDatePicker: Locator
     ocupancySelector: Locator
     addChildren: Locator
+    addAdult: Locator
+    addRoom: Locator
     childrenAge: Locator
     doneButton: Locator
     searchButton: Locator
     modalCloseButton: Locator
     textResult: Locator
+
 
     checkInOutDateBaseXpath = "[data-date='";
 
@@ -24,6 +27,8 @@ export class BookingPage {
         //this.checkOutDatePicker = page.locator('[data-date="2024-12-19"]');
         this.ocupancySelector = page.locator('button[data-testid="occupancy-config"]');
         this.addChildren = page.locator('input#group_children ~ div:last-of-type > button:last-of-type');
+        this.addAdult = page.locator('input#group_adults ~ div:last-of-type > button:last-of-type');
+        this.addRoom = page.locator('input#no_rooms ~ div:last-of-type > button:last-of-type');
         this.childrenAge = page.locator("select[name='age']");
         this.doneButton = page.locator('div[data-testid="occupancy-popup"] > div ~  button');
         this.searchButton = page.locator("button[type='submit']");
@@ -31,8 +36,8 @@ export class BookingPage {
         this.textResult = page.locator("div h1");
     }
 
-    async navigateTo(page: string) {
-        await this.page.goto(page, { waitUntil: 'networkidle' });
+    async bookingHotelsHomePage() {
+        await this.page.goto("https://www.booking.com/index.es-ar.html", { waitUntil: 'networkidle' });
     }
 
     async searchLocation(location: string) {
@@ -61,11 +66,21 @@ export class BookingPage {
     }
 
 
-    async addChildrenOcupancy(age: string) {
-        await this.ocupancySelector.click();
+    async addChildrenOccupancy(age: string) {
         await this.addChildren.click();
         await this.childrenAge.selectOption({ value: age });
         await this.doneButton.click();
+    }
+
+    async addAdultOccupancy() {
+        await this.addAdult.click();
+    }
+
+    async addExtraRoom(roomQuantity: number) {
+        await this.ocupancySelector.click();
+        for (let i = 1; i <= roomQuantity; i++) {
+            await this.addRoom.click();
+        }
     }
 
     async validateSearchResult(expectedResult: string) {

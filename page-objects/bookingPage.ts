@@ -4,8 +4,6 @@ export class BookingPage {
     page: Page;
     locationInput: Locator
     datePicker: Locator
-    //checkInDatePicker: Locator
-    //checkOutDatePicker: Locator
     ocupancySelector: Locator
     addChildren: Locator
     addAdult: Locator
@@ -23,8 +21,6 @@ export class BookingPage {
         this.page = page;
         this.locationInput = page.locator('[data-testid="destination-container"] input');
         this.datePicker = page.locator('[data-testid="date-display-field-start"]');
-        //this.checkInDatePicker = page.locator('[data-date="2024-12-12"]');
-        //this.checkOutDatePicker = page.locator('[data-date="2024-12-19"]');
         this.ocupancySelector = page.locator('button[data-testid="occupancy-config"]');
         this.addChildren = page.locator('input#group_children ~ div:last-of-type > button:last-of-type');
         this.addAdult = page.locator('input#group_adults ~ div:last-of-type > button:last-of-type');
@@ -65,6 +61,12 @@ export class BookingPage {
         await checkOutElement.click();
     }
 
+    async setOccupancy(adultsQuantity: number, roomQuantity: number, age: string) {
+        await this.ocupancySelector.click();
+        await this.addExtraAdults(adultsQuantity);
+        await this.addExtraRoom(roomQuantity);
+        await this.addChildrenOccupancy(age);
+    }
 
     async addChildrenOccupancy(age: string) {
         await this.addChildren.click();
@@ -72,12 +74,13 @@ export class BookingPage {
         await this.doneButton.click();
     }
 
-    async addAdultOccupancy() {
-        await this.addAdult.click();
+    async addExtraAdults(adultsQuantity: number) {
+        for (let i = 1; i <= adultsQuantity; i++) {
+            await this.addAdult.click();
+        }
     }
 
     async addExtraRoom(roomQuantity: number) {
-        await this.ocupancySelector.click();
         for (let i = 1; i <= roomQuantity; i++) {
             await this.addRoom.click();
         }

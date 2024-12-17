@@ -1,28 +1,32 @@
 import { test } from '@playwright/test';
-import { BookingPage } from '../page-objects/bookingPage';
+import { BookingHotelsHomePage } from '../page-objects/BookingHotelsHomePage';
+import { BookingHotelsResultPage } from '../page-objects/BookingHotelsResultPage';
+
 
 const testCases = [
-  { location: 'Mar del Plata', checkin: new Date(2024, 11, 12), checkout: new Date(2024, 11, 19), extraAdults: 2, extraRoomQuantity: 3, childrenQuantity: 1, childrenAge: ['10'] },
-  { location: 'Chascomús', checkin: new Date(2024, 11, 10), checkout: new Date(2024, 11, 22), extraAdults: 3, extraRoomQuantity: 4, childrenQuantity: 2, childrenAge: ['9', '7' ]},
-  { location: 'San Carlos de Bariloche', checkin: new Date(2024, 11, 8), checkout: new Date(2024, 11, 26), extraRoomQuantity: 2,  childrenQuantity: 1, childrenAge: ['11']},
-  { location: 'Salta', checkin: new Date(2024, 11, 14), checkout: new Date(2024, 11, 29), extraAdults: 1, extraRoomQuantity: 6,  childrenQuantity: 3, childrenAge: ['11', '12', '5']},
+  { location: 'Mar del Plata', checkin: new Date('20 December 2024'), checkout: new Date('28 December 2024'), adultQuantity: 2, roomQuantity: 3, childrenQuantity: 1, childrenAge: ['10'] },
+  { location: 'Chascomús', checkin: new Date('21 December 2024'), checkout: new Date('29 December 2024'), adultQuantity: 3, roomQuantity: 4, childrenQuantity: 2, childrenAge: ['9', '7'] },
+  { location: 'San Carlos de Bariloche', checkin: new Date('20 December 2024'), checkout: new Date('30 December 2024'), adultQuantity: 4, roomQuantity: 2, childrenQuantity: 1, childrenAge: ['11'] },
+  { location: 'Salta', checkin: new Date('19 December 2024'), checkout: new Date('31 December 2024'), adultQuantity: 1, roomQuantity: 2, childrenQuantity: 3, childrenAge: ['11', '12', '5'] },
 ];
 
-testCases.forEach(({ location, checkin, checkout, extraAdults, extraRoomQuantity,childrenQuantity, childrenAge }) => {
+testCases.forEach(({ location, checkin, checkout, adultQuantity, roomQuantity, childrenQuantity, childrenAge }) => {
   test(`Searching in booking -Parameterized - testing with ${location}`, async ({ page }) => {
-    const homePage = new BookingPage(page);
-    await homePage.bookingHotelsHomePage();
+    const homePage = new BookingHotelsHomePage(page);
+    const resultPage = new BookingHotelsResultPage(page);
+
+    await homePage.go();
 
     await homePage.closeModal();
 
     await homePage.searchLocation(location);
     await homePage.selectDates(checkin, checkout);
 
-    await homePage.setOccupancy(extraAdults, extraRoomQuantity, childrenQuantity, childrenAge);
+    await homePage.setOccupancy(adultQuantity, roomQuantity, childrenQuantity, childrenAge);
 
     await homePage.search();
 
-    await homePage.validateSearchResult(location);
+    await resultPage.validateSearchResult(location);
 
     await page.close();
 

@@ -3,7 +3,9 @@ import { Locator, Page, expect } from "@playwright/test";
 export class BookingHotelsHomePage {
     page: Page;
     locationInput: Locator
+    calendar: Locator
     datePicker: Locator
+    occupancyPopup: Locator
     ocupancySelector: Locator
     addChildren: Locator
     removeChildren: Locator
@@ -23,7 +25,9 @@ export class BookingHotelsHomePage {
     constructor(page: Page) {
         this.page = page;
         this.locationInput = page.locator('[data-testid="destination-container"] input');
+        this.calendar = page.locator('div#calendar-searchboxdatepicker');
         this.datePicker = page.locator('[data-testid="date-display-field-start"]');
+        this.occupancyPopup =  page.locator('[data-testid="occupancy-popup"]');
         this.ocupancySelector = page.locator('button[data-testid="occupancy-config"]');
         this.addChildren = page.locator('input#group_children ~ div:last-of-type > button:last-of-type');
         this.removeChildren = page.locator('input#group_children ~ div:last-of-type > button:first-of-type');
@@ -38,7 +42,6 @@ export class BookingHotelsHomePage {
         this.doneButton = page.locator('div[data-testid="occupancy-popup"] > div ~  button');
         this.searchButton = page.locator("button[type='submit']");
         this.modalCloseButton = page.locator('[aria-label="No quiero iniciar sesión."]');
-
     }
 
     async go() {
@@ -49,8 +52,15 @@ export class BookingHotelsHomePage {
         await this.locationInput.fill(location);
     }
 
+    async isCalendarVisible() {
+        if (!(await this.calendar.isVisible())) {
+            await this.datePicker.click();
+            await this.calendar.waitFor({ state: 'visible' });
+        }
+    }
+
     async selectDates(checkin: Date, checkout: Date) {
-        await this.datePicker.click();
+        await this.isCalendarVisible();
         await this.selectDate(checkin);
         await this.selectDate(checkout);
     }
@@ -64,8 +74,14 @@ export class BookingHotelsHomePage {
         await dateElement.click();
     }
 
+    async isOccupancyPopupVisible() {
+        if (!(await this.occupancyPopup.isVisible())) {
+            await this.ocupancySelector.click();
+            await this.occupancyPopup.waitFor({ state: 'visible' });
+        }
+    }
     async setOccupancy(adults: number, rooms: number, childrens: number, ages: string[]) {
-        await this.ocupancySelector.click();
+        this.isOccupancyPopupVisible();
         await this.setAdults(adults);
         await this.setRooms(rooms);
         await this.setChildren(childrens, ages);
@@ -73,9 +89,7 @@ export class BookingHotelsHomePage {
 
     async setAdults(adults: number) {
         await this.removeAdults();
-        if (adults == 1) {
-
-        } else {
+        if (!(adults == 1)) {
             for (let i = 1; i <= (adults - 1); i++) {
                 await this.addAdult.click();
             }
@@ -90,7 +104,7 @@ export class BookingHotelsHomePage {
 
     async setRooms(roomQuantity: number) {
         await this.removeRooms();
-        if (roomQuantity == 1) { } else {
+        if (!(roomQuantity == 1)) {
             for (let i = 1; i <= (roomQuantity - 1); i++) {
                 await this.addRoom.click();
             }

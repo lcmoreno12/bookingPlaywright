@@ -5,6 +5,9 @@ export class BookingHotelsHomePage {
     locationInput: Locator
     calendar: Locator
     datePicker: Locator
+    firstMonth: Locator
+    sndMonth: Locator
+    nextMonth: Locator
     occupancyPopup: Locator
     ocupancySelector: Locator
     addChildren: Locator
@@ -27,7 +30,10 @@ export class BookingHotelsHomePage {
         this.locationInput = page.locator('[data-testid="destination-container"] input');
         this.calendar = page.locator('div#calendar-searchboxdatepicker');
         this.datePicker = page.locator('[data-testid="date-display-field-start"]');
-        this.occupancyPopup =  page.locator('[data-testid="occupancy-popup"]');
+        this.firstMonth = page.locator('div[data-testid="searchbox-datepicker-calendar"] > div > div:first-of-type > h3');
+        this.sndMonth = page.locator('div[data-testid="searchbox-datepicker-calendar"] > div > div:last-of-type > h3');
+        this.nextMonth = page.locator('div[data-testid="searchbox-datepicker-calendar"] > button:last-of-type');
+        this.occupancyPopup = page.locator('[data-testid="occupancy-popup"]');
         this.ocupancySelector = page.locator('button[data-testid="occupancy-config"]');
         this.addChildren = page.locator('input#group_children ~ div:last-of-type > button:last-of-type');
         this.removeChildren = page.locator('input#group_children ~ div:last-of-type > button:first-of-type');
@@ -65,11 +71,19 @@ export class BookingHotelsHomePage {
         await this.selectDate(checkout);
     }
 
+    async checkCurrentMonth(date: Date) {
+        let month = date.toLocaleString('es', { month: 'long' });
+        while (!(await this.firstMonth.innerText()).includes(month) &&
+            !(await this.sndMonth.innerText()).includes(month)) {
+            await this.nextMonth.click();
+        }
+    }
+
     async selectDate(date: Date) {
         const DATE_CELL_SELECTOR = "[data-date='{date}']";
-        //let month = date.toLocaleString('es', { month: 'long' });
         const dateString = date.toISOString().split('T')[0];
         const dateElement = this.page.locator(DATE_CELL_SELECTOR.replace("{date}", dateString));
+        await this.checkCurrentMonth(date);
         await dateElement.waitFor({ state: 'visible' });
         await dateElement.click();
     }

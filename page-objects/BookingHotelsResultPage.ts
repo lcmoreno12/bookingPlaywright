@@ -10,6 +10,7 @@ export class BookingHotelsResultPage{
     }
 
     async validateSearchResult(expectedResult: string) {
+        await this.textResult.waitFor({ state: 'visible' });
         await expect(this.textResult).toContainText(expectedResult + ": ");
     }
 }

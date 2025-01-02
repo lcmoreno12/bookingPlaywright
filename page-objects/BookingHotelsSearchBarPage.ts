@@ -1,4 +1,4 @@
-import { Locator, Page, expect } from "@playwright/test";
+import { Locator, Page } from "@playwright/test";
 
 export class BookingHotelSearchBarPage {
     page: Page;
@@ -22,7 +22,7 @@ export class BookingHotelSearchBarPage {
     childrenAge: Locator
     doneButton: Locator
     searchButton: Locator
-
+    readonly DATE_CELL_SELECTOR: string = "[data-date='{date}']";
 
     constructor(page: Page) {
         this.page = page;
@@ -75,9 +75,9 @@ export class BookingHotelSearchBarPage {
     }
 
     async selectDate(date: Date) {
-        const DATE_CELL_SELECTOR = "[data-date='{date}']";
+        //const DATE_CELL_SELECTOR = "[data-date='{date}']";
         const dateString = date.toISOString().split('T')[0];
-        const dateElement = this.page.locator(DATE_CELL_SELECTOR.replace("{date}", dateString));
+        const dateElement = this.page.locator(this.DATE_CELL_SELECTOR.replace("{date}", dateString));
         await this.moveToMonth(date);
         await dateElement.waitFor({ state: 'visible' });
         await dateElement.click();
@@ -89,11 +89,11 @@ export class BookingHotelSearchBarPage {
             await this.occupancyPopup.waitFor({ state: 'visible' });
         }
     }
-    async setOccupancy(adults: number, rooms: number, childrens: number, ages: string[]) {
+    async setOccupancy(adults: number, rooms: number, ages: string[]) {
         this.isOccupancyPopupVisible();
         await this.setAdults(adults);
         await this.setRooms(rooms);
-        await this.setChildren(childrens, ages);
+        await this.setChildren(ages);
     }
 
     async setAdults(adults: number) {
@@ -126,9 +126,9 @@ export class BookingHotelSearchBarPage {
         }
     }
 
-    async setChildren(childrenQuantity: number, age: string[]) {
+    async setChildren(age: string[]) {
         await this.removeChildrens();
-        for (let i = 0; i < childrenQuantity; i++) {
+        for (let i = 0; i < age.length; i++) {
             await this.addChildren.click();
             await this.childrenAge.nth(i).selectOption({ value: age[i] });
         }

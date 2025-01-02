@@ -13,7 +13,7 @@ export class BookingHotelsHomePage {
     }
 
     async go() {
-        await this.page.goto(this.url, { waitUntil: 'networkidle' });
+        await this.page.goto(this.url, { timeout: 60000, waitUntil: 'networkidle' });
     }
 
     async closeModal() {
